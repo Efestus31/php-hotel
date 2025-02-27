@@ -40,10 +40,18 @@ $hotels = [
 
 ];
 
+//controlla se la richiesta del parking é valida
 $parking_requested = false;
-//controlla se la richiesta é valida
-if(isset($_GET['parking']) && $_GET['parking'] == "on") {
+
+if (isset($_GET['parking']) && $_GET['parking'] == "on") {
     $parking_requested = true;
+}
+
+//controlla se la richiesta del voto é valida
+$minimum_vote = 0;
+
+if (isset($_GET['minimum_vote']) && is_numeric($_GET['minimum_vote']) && $_GET['minimum_vote'] > 0 && $_GET['minimum_vote'] <= 5) {
+    $minimum_vote = (int)$_GET['minimum_vote'];
 }
 
 
@@ -60,17 +68,21 @@ if(isset($_GET['parking']) && $_GET['parking'] == "on") {
 
 <body>
     <div class="container mt-5">
-<h2>Filtri di ricerca</h2>
-<form action="" method="GET">
-    <div class="form-control">
-        <label for="parking">Disponibilità parcheggio:</label>
-        <input id="parking" name="parking" type="checkbox">
-
-    </div>
-
-    <button>Filtra</button>
-</form>
-<hr>
+        <h2>Filtri di ricerca</h2>
+        <form action="" method="GET">
+            <div class="d-flex mb-2">
+                <div class="form-control">
+                    <label for="parking">Disponibilità parcheggio:</label>
+                    <input id="parking" name="parking" type="checkbox">
+                </div>
+                <div class="form-control">
+                    <label for="minimum_vote">Voto:</label>
+                    <input name="minimum_vote" id="minimum_vote" type="number" min="1" max='5'>
+                </div>
+            </div>
+            <button>Filtra</button>
+        </form>
+        <hr>
         <h2 class='mb-4'> Lista degli hotel </h2>
         <hr>
         <!-- Tabella -->
@@ -90,13 +102,21 @@ if(isset($_GET['parking']) && $_GET['parking'] == "on") {
 
                     //se l' utente ha selezionato il parcheggio 
                     //mostriamo solo gli hotel con il parcheggio
-                    if($parking_requested){
+                    if ($parking_requested) {
                         //controlliamo se l'hotel in cui stiamo iterando NON ha il parcheggio
-                        if(! $hotel['parking']){
+                        if (! $hotel['parking']) {
                             continue;
                         }
                     }
-                ?> 
+                    //se l'utente ha selezionato il voto minimo
+                    //mostriamo solo gli hotel con il voto minimo desiderato
+                    if ($minimum_vote) {
+                        //controlliamo se il voto dell' hotel e minore o uguale al voto minimo
+                        if ($hotel['vote'] < $minimum_vote) {
+                            continue;
+                        }
+                    }
+                ?>
                     <tr>
                         <td><?php echo $hotel["name"]; ?></td>
                         <td><?php echo $hotel["description"]; ?></td>
